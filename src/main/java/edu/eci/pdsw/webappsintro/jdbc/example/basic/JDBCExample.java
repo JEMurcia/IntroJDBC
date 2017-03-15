@@ -34,10 +34,10 @@ public class JDBCExample {
     
     public static void main(String args[]){
         try {
-            String url="jdbc:mysql://HOST:3306/BD";
+            String url="jdbc:mysql://desarrollo.is.escuelaing.edu.co:3306/bdprueba";
             String driver="com.mysql.jdbc.Driver";
-            String user="USER";
-            String pwd="PWD";
+            String user="bdprueba";
+            String pwd="bdprueba";
                         
             Class.forName(driver);
             Connection con=DriverManager.getConnection(url,user,pwd);
@@ -100,13 +100,24 @@ public class JDBCExample {
      */
     public static List<String> nombresProductosPedido(Connection con, int codigoPedido){
         List<String> np=new LinkedList<>();
-        
-        //Crear prepared statement
-        //asignar parámetros
-        //usar executeQuery
-        //Sacar resultados del ResultSet
-        //Llenar la lista y retornarla
-        
+        String query = "SELECT nombre FROM ORD_DETALLES_PEDIDO,ORD_PRODUCTOS WHERE pedido_fk = ? AND producto_fk = codigo;";
+        try{
+            //Crear prepared statement
+            PreparedStatement productosPedido = con.prepareStatement(query);
+            //asignar parámetros
+            productosPedido.setInt(1, codigoPedido);
+            //usar executeQuery
+            ResultSet rs = productosPedido.executeQuery();
+            //Sacar resultados del ResultSet
+            //Llenar la lista y retornarla
+            while(rs.next()){
+                np.add(rs.getString("nombre"));
+            }
+            rs.close();
+        }catch(SQLException ex){
+            //log exception
+            Logger.getLogger(JDBCExample.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return np;
     }
 
@@ -118,14 +129,28 @@ public class JDBCExample {
      * @return el costo total del pedido (suma de: cantidades*precios)
      */
     public static int valorTotalPedido(Connection con, int codigoPedido){
+        String query = "SELECT cantidad,precio FROM ORD_DETALLES_PEDIDO,ORD_PRODUCTOS WHERE pedido_fk = ? AND producto_fk = codigo;";
+        int costo = 0;
+        try{
+            //Crear prepared statement
+            PreparedStatement productosPedido = con.prepareStatement(query);
+            //asignar parámetros
+            productosPedido.setInt(1, codigoPedido);
+            //usar executeQuery
+            ResultSet rs = productosPedido.executeQuery();
+            //Sacar resultados del ResultSet
+            while(rs.next()){
+                costo += rs.getInt("cantidad")*rs.getInt("precio");
+            }
+            rs.close();
+        }catch(SQLException ex){
+            //log exception
+            Logger.getLogger(JDBCExample.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        //Crear prepared statement
-        //asignar parámetros
-        //usar executeQuery
-        //Sacar resultado del ResultSet
-        
-        return 0;
+        return costo;
     }
+    
     
 
     /**
