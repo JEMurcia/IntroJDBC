@@ -86,9 +86,15 @@ public class JDBCExample {
         //Crear preparedStatement
         //Asignar parámetros
         //usar 'execute'
-
+        String insertar="inset table bdprueba.ORD_PRODUCTOS (codigo, nombre, "
+                + "preci) values (?,?,?);";
+        PreparedStatement ps= con.prepareStatement(insertar);
+        ps.setInt(1, codigo);
+        ps.setString(2, nombre);
+        ps.setInt(3, precio);
+        ps.executeUpdate();
         
-        con.commit();
+//        con.commit();
         
     }
     
@@ -159,13 +165,21 @@ public class JDBCExample {
      * @param codigoProducto codigo del producto cuyo nombre se cambiará
      * @param nuevoNombre el nuevo nombre a ser asignado
      */
-    public static void cambiarNombreProducto(Connection con, int codigoProducto, 
-            String nuevoNombre){
-        
-        //Crear prepared statement
-        //asignar parámetros
-        //usar executeUpdate
-        //verificar que se haya actualizado exactamente un registro
+    public static void cambiarNombreProducto(Connection con, int codigoProducto, String nuevoNombre){
+        try {
+            String query="update bdprueba.ORD_PRODUCTOS "
+                    + "set bdprueba.nombre = ? "
+                    + "where bdprueba.codigo = ?";
+            //Crear prepared statement
+            PreparedStatement ps=con.prepareStatement(query);
+            //asignar parámetros
+            ps.setString(1, nuevoNombre);
+            ps.setInt(2, codigoProducto);
+            //usar executeUpdate
+            //verificar que se haya actualizado exactamente un registro
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCExample.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
     }
